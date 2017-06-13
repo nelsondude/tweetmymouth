@@ -1,5 +1,5 @@
 """
-Django settings for tweetmymouth project on Heroku. For more info, see:
+Django settings for tweetme project on Heroku. For more info, see:
 https://github.com/heroku/heroku-django-template
 
 For more information on this file, see
@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     # http://whitenoise.evans.io/en/stable/django.html#using-whitenoise-in-development
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
-    'tweet',
+    'tweets',
 ]
 
 MIDDLEWARE = [
@@ -53,7 +53,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'tweetmymouth.urls'
+ROOT_URLCONF = 'tweetme.urls'
 
 TEMPLATES = [
     {
@@ -72,7 +72,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'tweetmymouth.wsgi.application'
+WSGI_APPLICATION = 'tweetme.wsgi.application'
 
 
 # Database
