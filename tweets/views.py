@@ -1,7 +1,8 @@
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import DetailView, ListView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
+from django.db.models import Q
 
 # Create your views here.
 from .models import Tweet
@@ -12,13 +13,13 @@ class TweetDeleteView(LoginRequiredMixin, DeleteView):
     # queryset = Tweet.objects.all()
     # model or queryset
     model = Tweet
-    success_url = reverse_lazy('home')
+    success_url = reverse_lazy('tweet:list')
     template_name = "tweets/delete_confirm.html"
 
 
 class TweetUpdateView(LoginRequiredMixin, UserOwnerMixin, UpdateView):
     form_class = TweetModelForm
-    success_url = "/tweet/"
+    # success_url = "/tweet/"
     template_name = "tweets/update_view.html"
     queryset = Tweet.objects.all()
 
@@ -26,9 +27,12 @@ class TweetUpdateView(LoginRequiredMixin, UserOwnerMixin, UpdateView):
 class TweetCreateView(FormUserNeededMixin, CreateView): #LoginRequiredMixin, 
     form_class = TweetModelForm
     template_name = "tweets/create_view.html"
-    success_url = "/tweet/create/"
+    # success_url = "/tweet/create/"
 
     # login_url = '/admin/'
+    # def form_valid(self, form):
+    #     form.instance.user = self.request.user
+    #     return super(TweetCreateView, self).form_valid(form)
 
 class TweetDetailView(DetailView):
     queryset = Tweet.objects.all()
@@ -36,12 +40,23 @@ class TweetDetailView(DetailView):
 
 class TweetListView(ListView):
     # template_name = "tweets/list_view.html"
-    queryset = Tweet.objects.all()
+    # queryset = Tweet.objects.all()
+
+    def get_queryset(self, *args, **kwargs):
+        qs = Tweet.objects.all()
+        query = self.request.GET.get("q", None)
+        if query is not None:
+            qs = qs.filter(
+                Q(content__icontains=query) |
+                Q(user__username__icontains=query) #complex lookups
+                )
+
+
+        return qs
 
     def get_context_data(self, *args, **kwargs):
         context = super(TweetListView, self).get_context_data(*args, **kwargs)
-        print(context)
-        context["another thing"] = 42
+        # context["another thing"] = 42
         return context
 
 

@@ -1,2 +1,10 @@
-{{object.content}}<br/>
-{{object.timestamp}}<br/>
+{%extends 'base.html' %}
+
+{%block content%}
+    {{object.content}}<br/>
+    {{object.timestamp}}<br/>
+    {{object.id}}<br/>
+
+{%endblock content%}
+
+
