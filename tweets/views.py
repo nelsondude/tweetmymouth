@@ -1,5 +1,7 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import DetailView, ListView, CreateView, UpdateView, DeleteView
+from django.views import View
+from django.http import HttpResponseRedirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy, reverse
 from django.db.models import Q
@@ -8,6 +10,15 @@ from django.db.models import Q
 from .models import Tweet
 from .forms import TweetModelForm
 from .mixins import FormUserNeededMixin, UserOwnerMixin
+
+class RetweetView(View):
+    def get(self, request, pk, *args, **kwargs):
+        tweet = get_object_or_404(Tweet, pk=pk)
+        if request.user.is_authenticated():
+            new_tweet = Tweet.objects.retweet(request.user, tweet)
+            if new_tweet:
+                return HttpResponseRedirect(new_tweet.get_absolute_url())
+        return HttpResponseRedirect(tweet.get_absolute_url())
 
 class TweetDeleteView(LoginRequiredMixin, DeleteView):
     # queryset = Tweet.objects.all()
@@ -56,6 +67,8 @@ class TweetListView(ListView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(TweetListView, self).get_context_data(*args, **kwargs)
+        context['create_form'] = TweetModelForm()
+        context['create_url'] = reverse_lazy("tweet:create")
         # context["another thing"] = 42
         return context
 
@@ -66,7 +79,6 @@ class TweetListView(ListView):
 def tweet_detail_view(request,pk=None):
 
     obj = Tweet.objects.get(pk=pk) #GET object
-    print(obj)
     context = {
         'object': obj,
 
@@ -77,7 +89,6 @@ def tweet_detail_view(request,pk=None):
 
 def tweet_list_view(request):
     queryset = Tweet.objects.all()
-    print(queryset)
     context = {
         'object_list': queryset,
 

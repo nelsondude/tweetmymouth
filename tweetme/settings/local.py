@@ -39,6 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'tweets',
     'whitenoise.runserver_nostatic',
+    'crispy_forms',
+    'rest_framework',
+    'accounts',
+    'hashtags',
 ]
 
 MIDDLEWARE = [
@@ -128,6 +132,8 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static-serve")
+
+CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
 
 
