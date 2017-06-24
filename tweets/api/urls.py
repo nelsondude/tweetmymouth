@@ -11,6 +11,7 @@ from .views import (
     TweetCreateAPIView,
     RetweetAPIView,
     LikeToggleAPIView,
+    TweetDetailAPIView,
     )
 
 
@@ -18,6 +19,7 @@ urlpatterns = [
     # url(r'^(?P<pk>\d+)/delete/$', TweetDeleteView.as_view(), name='delete'),
     # url(r'^(?P<pk>\d+)/update/$', TweetUpdateView.as_view(), name='update'),
     # url(r'^(?P<pk>\d+)/$', TweetDetailView.as_view(), name='detail'),
+    url(r'^(?P<pk>\d+)/$', TweetDetailAPIView.as_view(), name='detail'),
     url(r'^(?P<pk>\d+)/like$', LikeToggleAPIView.as_view(), name='like-toggle'),
     url(r'^(?P<pk>\d+)/retweet$', RetweetAPIView.as_view(), name='retweet'),
     url(r'^$', TweetListAPIView.as_view(), name='list'),

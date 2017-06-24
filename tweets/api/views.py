@@ -47,6 +47,47 @@ class TweetCreateAPIView(generics.CreateAPIView):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+class TweetDetailAPIView(generics.ListAPIView):
+
+    serializer_class = TweetModelSerializer
+    permission_classes = [permissions.AllowAny]
+    # queryset = Tweet.objects.all()
+    pagination_class = StandardResultsPagination
+
+    def get_queryset(self, *args, **kwargs):
+        tweet_id = self.kwargs.get("pk")
+        qs = Tweet.objects.filter(pk=tweet_id)
+        if qs.exists() and qs.count() == 1:
+            parent_obj = qs.first()
+            qs1 = parent_obj.get_children()
+            qs = (qs | qs1).distinct().extra(select={"parent_id_null":'parent_id IS NULL'})
+        return qs.order_by("-parent_id_null", '-timestamp')
+
+class SearchTweetAPIView(generics.ListAPIView):
+    queryset = Tweet.objects.all().order_by("-timestamp")
+    serializer_class = TweetModelSerializer
+    pagination_class = StandardResultsPagination
+
+    def get_serializer_context(self, *args, **kwargs):
+
+        context = super(SearchTweetAPIView, self).get_serializer_context(*args, **kwargs)
+        context['request'] = self.request
+        return context
+
+    def get_queryset(self, *args, **kwargs):
+        # if there is a request user than go to that user
+        # else go to the page that lists all tweets, not just one user
+
+        qs = self.queryset
+        query = self.request.GET.get("q", None)
+        if query is not None:
+            qs = qs.filter(
+                Q(content__icontains=query) |
+                Q(user__username__icontains=query) #complex lookups
+                )
+
+
+        return qs
 
 class TweetListAPIView(generics.ListAPIView):
 

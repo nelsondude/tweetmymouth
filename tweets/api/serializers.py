@@ -27,13 +27,15 @@ class ParentTweetModelSerializer(serializers.ModelSerializer):
         ]
 
     def get_did_like(self, obj):
-        return True
-        request = self.context.get("request")
-        print(self.context)
-        user = request.user
-        if user.is_authenticated():
-            if user in obj.liked.all():
-                return True
+        try:
+            request = request.user
+            user = request.user
+            if user.is_authenticated():
+                if user in obj.liked.all():
+                    return True
+        except:
+            pass
+            
         return False
 
     def get_likes(self,obj):
@@ -54,6 +56,7 @@ class ParentTweetModelSerializer(serializers.ModelSerializer):
 
 
 class TweetModelSerializer(serializers.ModelSerializer):
+    parent_id = serializers.CharField(write_only = True, required = False)
     user = UserDisplaySerializer(read_only=True) #write only
     date_display = serializers.SerializerMethodField()
     timesince = serializers.SerializerMethodField()
@@ -64,6 +67,7 @@ class TweetModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tweet
         fields = [
+            'parent_id',
             'id',
             'user',
             'content',
@@ -76,14 +80,20 @@ class TweetModelSerializer(serializers.ModelSerializer):
             'reply',
 
         ]
+
+        # read_only_fields = k['reply']
+
+
     def get_did_like(self, obj):
-        return True
-        request = self.context.get("request")
-        print(self.context)
-        user = request.user
-        if user.is_authenticated():
-            if user in obj.liked.all():
-                return True
+        try:
+            request = self.context.get("request")
+            user = request.user
+            if user.is_authenticated():
+                if user in obj.liked.all():
+                    return True
+        except:
+            pass
+
         return False
 
 
